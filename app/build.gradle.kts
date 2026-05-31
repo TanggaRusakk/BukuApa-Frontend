@@ -56,12 +56,21 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
+// --- Kebutuhan Arsitektur UI (ViewModel & Navigasi) ---
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.compose.material:material-icons-core")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.datastore:datastore-preferences")
+
+// --- Kebutuhan Ikon Visual Tambahan ---
+    implementation("androidx.compose.material:material-icons-core:1.6.7")
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+
+// --- Kebutuhan Penyimpanan Data Lokal (Token) ---
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+// --- Kebutuhan Keamanan (Decode JWT) ---
     implementation("com.auth0.android:jwtdecode:2.0.2")
+
+// --- Kebutuhan Jaringan (Menembak API Backend) ---
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
