@@ -2,6 +2,7 @@ package com.example.bukuapa_frontend.ui.views.book
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,16 +25,18 @@ import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
 
 @Composable
 fun ManageBookView(
+    onNavigateToCreateUpdate: (book: com.example.bukuapa_frontend.data.models.Book?) -> Unit,
     viewModel: ManageBookViewModel = viewModel()
 ) {
     val books by viewModel.books.collectAsState()
+    val isLoadingBooks by viewModel.isLoadingBooks.collectAsState()
     LaunchedEffect(Unit) { viewModel.fetchBooks() }
 
     Scaffold(
         topBar = { TopNavigatorBar(title = "Kelola Inventaris") },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* TODO */ },
+                onClick = { onNavigateToCreateUpdate(null) },
                 containerColor = Color(0xFF1158C4),
                 contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp)
@@ -42,70 +45,82 @@ fun ManageBookView(
             }
         }
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .background(Color(0xFFF8F9FA)), // Background abu-abu sangat muda seperti desain
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(books) { book ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Row(
+        if (isLoadingBooks) {
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(Color(0xFFF8F9FA)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color(0xFF1158C4))
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(Color(0xFFF8F9FA)),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(books) { book ->
+                    Card(
                         modifier = Modifier
-                            .padding(16.dp)
                             .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        // Kotak gambar abu-abu
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .size(60.dp, 80.dp)
-                                .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp)),
-                            contentAlignment = Alignment.Center
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                                .clickable { onNavigateToCreateUpdate(book) },
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Book, contentDescription = null, tint = Color.Gray)
-                        }
-
-                        Spacer(modifier = Modifier.width(16.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                book.title,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black
-                            )
-                            Text(book.author, fontSize = 12.sp, color = Color.Gray)
-                            Spacer(Modifier.height(8.dp))
-
-                            // Pill Stok mirip di desain Katalog
                             Box(
                                 modifier = Modifier
-                                    .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(50.dp))
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                                    .size(60.dp, 80.dp)
+                                    .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp)),
+                                contentAlignment = Alignment.Center
                             ) {
+                                Icon(Icons.Default.Book, contentDescription = null, tint = Color.Gray)
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    "Stok ${book.stock}",
-                                    color = Color(0xFF4CAF50),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
+                                    book.title,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                                Text(book.author, fontSize = 12.sp, color = Color.Gray)
+                                Spacer(Modifier.height(8.dp))
+
+                                Box(
+                                    modifier = Modifier
+                                        .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(50.dp))
+                                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        "Stok ${book.stock}",
+                                        color = Color(0xFF4CAF50),
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+                            IconButton(onClick = { viewModel.deleteBook(book.id) }) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Hapus",
+                                    tint = Color(0xFFD32F2F)
                                 )
                             }
-                        }
-
-                        IconButton(onClick = { viewModel.deleteBook(book.id) }) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Hapus",
-                                tint = Color(0xFFD32F2F)
-                            )
                         }
                     }
                 }

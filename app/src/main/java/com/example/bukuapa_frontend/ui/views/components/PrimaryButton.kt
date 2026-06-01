@@ -10,16 +10,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit, isLoading: Boolean = false) {
+fun PrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    isLoading: Boolean = false,
+    modifier: Modifier = Modifier.fillMaxWidth()
+) {
     Button(
         onClick = onClick,
         enabled = !isLoading,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp), // Tinggi sesuai gambar
-        shape = CircleShape, // 🌟 Membuatnya berbentuk pil seperti di gambar
+        modifier = modifier.height(50.dp),
+        shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF1158C4), // 🌟 Warna biru persis Figma
+            containerColor = Color(0xFF1158C4),
             contentColor = Color.White
         )
     ) {
