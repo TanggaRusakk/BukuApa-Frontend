@@ -6,4 +6,5 @@ sealed class Screen(val route: String) {
     object ManageBook : Screen("manage_book")
     object Catalog : Screen("catalog")
     object Borrowing : Screen("borrowing")
+    object Account : Screen("akun") // 🌟 TAMBAHKAN BARIS INI
 }

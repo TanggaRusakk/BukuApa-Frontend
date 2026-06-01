@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.auth0.android.jwt.JWT
+import com.example.bukuapa_frontend.ui.views.auth.AccountView
 import com.example.bukuapa_frontend.ui.views.auth.LoginView
 import com.example.bukuapa_frontend.ui.views.auth.RegisterView
 import com.example.bukuapa_frontend.ui.views.book.ManageBookView
@@ -26,33 +27,34 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // 🌟 PERSIAPAN MEMBACA DATA LOKAL & COROUTINE
+    // Persiapan membaca data lokal & coroutine
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val tokenManager = remember { TokenManager(context) }
 
     // Memantau keberadaan token di dalam HP
     val token by tokenManager.getToken().collectAsState(initial = null)
-    var userRole by remember { mutableStateOf("MEMBER") }
 
-    // Jika token berubah, kita ekstrak "role"-nya untuk keperluan Navbar
-    LaunchedEffect(token) {
+    // Membaca role secara reaktif dan instan (tanpa delay)
+    val userRole = remember(token) {
         if (token != null) {
             try {
-                val jwt = JWT(token!!)
-                userRole = jwt.getClaim("role").asString() ?: "MEMBER"
+                // Menggunakan uppercase() agar kebal terhadap penulisan "staff" atau "STAFF"
+                JWT(token!!).getClaim("role").asString()?.uppercase() ?: "MEMBER"
             } catch (e: Exception) {
-                userRole = "MEMBER"
+                "MEMBER"
             }
+        } else {
+            "MEMBER"
         }
     }
 
-    // 🌟 FUNGSI LOGOUT GLOBAL
+    // Fungsi logout dengan deklarasi tipe yang eksplisit agar tidak error
     val performLogout: () -> Unit = {
         coroutineScope.launch {
             tokenManager.clearToken() // Hapus token dari HP
             navController.navigate(Screen.Login.route) {
-                popUpTo(0) { inclusive = true } // Bersihkan seluruh riwayat halaman (Backstack)
+                popUpTo(0) { inclusive = true } // Bersihkan seluruh riwayat halaman
             }
         }
     }
@@ -65,7 +67,7 @@ fun AppNavigation() {
             if (showBottomBar) {
                 BottomNavigatorBar(
                     currentRoute = currentRoute ?: "",
-                    role = userRole, // 🌟 MENGIRIM ROLE KE NAVBAR AGAR DINAMIS
+                    role = userRole,
                     onNavigate = { route ->
                         navController.navigate(route) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
@@ -87,18 +89,16 @@ fun AppNavigation() {
                     onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                     onLoginSuccess = { tokenString ->
                         try {
-                            val role = JWT(tokenString).getClaim("role").asString()
+                            // Pengecekan saat login berhasil
+                            val role = JWT(tokenString).getClaim("role").asString()?.uppercase()
+
                             if (role == "STAFF") {
                                 navController.navigate(Screen.ManageBook.route) {
-                                    popUpTo(Screen.Login.route) {
-                                        inclusive = true
-                                    }
+                                    popUpTo(Screen.Login.route) { inclusive = true }
                                 }
                             } else {
                                 navController.navigate(Screen.Catalog.route) {
-                                    popUpTo(Screen.Login.route) {
-                                        inclusive = true
-                                    }
+                                    popUpTo(Screen.Login.route) { inclusive = true }
                                 }
                             }
                         } catch (e: Exception) {
@@ -113,17 +113,15 @@ fun AppNavigation() {
             }
 
             composable(Screen.ManageBook.route) {
-                // 🌟 Mengoper aksi logout ke layar Kelola Buku
-                ManageBookView(onLogout = performLogout)
+                // Mengoper fungsi logout ke Navbar di halaman Kelola Buku
+                ManageBookView()
             }
 
             composable(Screen.Catalog.route) {
-                // Halaman Katalog sementara (Timmu juga harus memasang fungsi onLogout nanti di sini)
                 Scaffold(
                     topBar = {
                         TopNavigatorBar(
-                            title = "Katalog Buku",
-                            onLogoutClick = performLogout
+                            title = "Katalog Buku"
                         )
                     }
                 ) { padding ->
@@ -141,14 +139,23 @@ fun AppNavigation() {
                     topBar = {
                         TopNavigatorBar(
                             title = "Peminjaman",
-                            onLogoutClick = performLogout
                         )
                     }
                 ) { padding ->
-                    Text("Halaman Peminjaman", modifier = Modifier
-                        .padding(padding)
-                        .padding(16.dp))
+                    Text(
+                        "Halaman Peminjaman",
+                        modifier = Modifier
+                            .padding(padding)
+                            .padding(16.dp)
+                    )
                 }
+            }
+
+            composable(Screen.Account.route) {
+                AccountView(
+                    userRole = userRole, // Untuk membedakan tampilan profil Staf/Member
+                    onLogout = performLogout // 🌟 Tombol logout sekarang ada di sini!
+                )
             }
         }
     }
