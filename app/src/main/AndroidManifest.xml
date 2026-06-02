@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BukuApaFrontend">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.bukuapa_frontend.MainActivity"
             android:exported="true"
             android:label="BukuApa"
             android:theme="@style/Theme.BukuApaFrontend">

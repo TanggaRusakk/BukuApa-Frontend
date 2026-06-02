@@ -16,8 +16,10 @@ import com.example.bukuapa_frontend.data.models.Book
 import com.example.bukuapa_frontend.ui.views.auth.AccountView
 import com.example.bukuapa_frontend.ui.views.auth.LoginView
 import com.example.bukuapa_frontend.ui.views.auth.RegisterView
+import com.example.bukuapa_frontend.ui.views.book.CatalogView
 import com.example.bukuapa_frontend.ui.views.book.CreateUpdateBookView
 import com.example.bukuapa_frontend.ui.views.book.ManageBookView
+import com.example.bukuapa_frontend.ui.views.borrowing.BorrowingView
 import com.example.bukuapa_frontend.ui.views.components.BottomNavigatorBar
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
 import com.example.bukuapa_frontend.utils.TokenManager
@@ -138,37 +140,21 @@ fun AppNavigation() {
             }
 
             composable(Screen.Catalog.route) {
-                Scaffold(
-                    topBar = {
-                        TopNavigatorBar(
-                            title = "Katalog Buku"
-                        )
-                    }
-                ) { padding ->
-                    Text(
-                        "Halaman Katalog (Member)",
-                        modifier = Modifier
-                            .padding(padding)
-                            .padding(16.dp)
-                    )
-                }
+                CatalogView(
+                    onNavigate = { route ->
+                        navController.navigate(route)
+                    },
+                    role = userRole
+                )
             }
 
             composable(Screen.Borrowing.route) {
-                Scaffold(
-                    topBar = {
-                        TopNavigatorBar(
-                            title = "Peminjaman",
-                        )
-                    }
-                ) { padding ->
-                    Text(
-                        "Halaman Peminjaman",
-                        modifier = Modifier
-                            .padding(padding)
-                            .padding(16.dp)
-                    )
-                }
+                BorrowingView(
+                    onNavigate = { route ->
+                        navController.navigate(route)
+                    },
+                    role = userRole
+                )
             }
 
             composable(Screen.Account.route) {
