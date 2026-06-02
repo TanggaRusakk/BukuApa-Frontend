@@ -1,6 +1,7 @@
 package com.example.bukuapa_frontend.data.api
 
 import com.example.bukuapa_frontend.data.models.Book
+import com.example.bukuapa_frontend.data.models.User
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
@@ -14,8 +15,24 @@ interface ApiService {
     @POST("login")
     suspend fun login(@Body request: Map<String, String>): ApiResponse<Map<String, String>>
 
+    @GET("users/me")
+    suspend fun getCurrentUser(@Header("Authorization") token: String): ApiResponse<User>
+
     @GET("books")
     suspend fun getBooks(@Header("Authorization") token: String): ApiResponse<List<Book>>
+
+    @POST("books")
+    suspend fun createBook(
+        @Header("Authorization") token: String,
+        @Body book: Book
+    ): ApiResponse<Book>
+
+    @PUT("books/{bookId}")
+    suspend fun updateBook(
+        @Header("Authorization") token: String,
+        @Path("bookId") bookId: Int,
+        @Body book: Book
+    ): ApiResponse<Book>
 
     @DELETE("books/{bookId}")
     suspend fun deleteBook(

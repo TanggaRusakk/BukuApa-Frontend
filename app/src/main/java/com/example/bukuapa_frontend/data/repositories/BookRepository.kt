@@ -13,6 +13,22 @@ class BookRepository : BookRepositoryProtocol {
         }
     }
 
+    override suspend fun createBook(token: String, book: Book): Result<Book> {
+        return try {
+            Result.success(ApiClient.instance.createBook("Bearer $token", book).data)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun updateBook(token: String, bookId: Int, book: Book): Result<Book> {
+        return try {
+            Result.success(ApiClient.instance.updateBook("Bearer $token", bookId, book).data)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun deleteBook(token: String, bookId: Int): Result<Boolean> {
         return try {
             ApiClient.instance.deleteBook("Bearer $token", bookId)
