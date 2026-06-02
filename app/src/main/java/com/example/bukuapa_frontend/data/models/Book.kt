@@ -8,5 +8,7 @@ data class Book(
     val publisher: String = "",
     val publishedYear: Int = 0,
     val totalPages: Int = 0,
-    val stock: Int = 0
+    val stock: Int = 0,
+    val categories: List<Category>? = null,
+    val categoryIds: List<Int>? = null
 )

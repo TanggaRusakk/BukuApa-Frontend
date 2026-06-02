@@ -1,6 +1,7 @@
 package com.example.bukuapa_frontend.data.api
 
 import com.example.bukuapa_frontend.data.models.Book
+import com.example.bukuapa_frontend.data.models.Category
 import com.example.bukuapa_frontend.data.models.User
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,6 +40,9 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("bookId") bookId: Int
     ): ApiResponse<Any>
+
+    @GET("categories")
+    suspend fun getCategories(@Header("Authorization") token: String): ApiResponse<List<Category>>
 }
 
 object ApiClient {

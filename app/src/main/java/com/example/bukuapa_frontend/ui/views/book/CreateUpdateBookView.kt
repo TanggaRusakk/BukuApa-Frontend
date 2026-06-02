@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bukuapa_frontend.data.models.Book
 import com.example.bukuapa_frontend.ui.viewmodels.book.ManageBookViewModel
+import com.example.bukuapa_frontend.ui.views.components.CategorySelectSection
 import com.example.bukuapa_frontend.ui.views.components.CustomTextField
 import com.example.bukuapa_frontend.ui.views.components.PrimaryButton
 
@@ -35,10 +36,20 @@ fun CreateUpdateBookView(
     var totalPages by remember { mutableStateOf(book?.totalPages?.toString() ?: "") }
     var stock by remember { mutableStateOf(book?.stock?.toString() ?: "") }
     
+    var selectedCategoryIds by remember { 
+        mutableStateOf(book?.categories?.map { it.id } ?: emptyList<Int>()) 
+    }
+
     var showError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
 
     val isLoading by viewModel.isLoading.collectAsState()
+    val categories by viewModel.categories.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchCategories()
+    }
+
     val isEditMode = book != null
     val pageTitle = if (isEditMode) "Edit Buku" else "Tambah Buku Baru"
 
@@ -188,6 +199,19 @@ fun CreateUpdateBookView(
                 onValueChange = { stock = it },
                 label = "Jumlah Stok"
             )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            CategorySelectSection(
+                categories = categories,
+                selectedCategoryIds = selectedCategoryIds,
+                onCategoryToggle = { id ->
+                    selectedCategoryIds = if (selectedCategoryIds.contains(id)) {
+                        selectedCategoryIds - id
+                    } else {
+                        selectedCategoryIds + id
+                    }
+                }
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             PrimaryButton(
@@ -202,7 +226,8 @@ fun CreateUpdateBookView(
                             publisher = publisher,
                             publishedYear = publishedYear.toIntOrNull() ?: 0,
                             totalPages = totalPages.toIntOrNull() ?: 0,
-                            stock = stock.toIntOrNull() ?: 0
+                            stock = stock.toIntOrNull() ?: 0,
+                            categoryIds = selectedCategoryIds
                         )
 
                         if (isEditMode && book != null) {

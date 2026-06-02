@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bukuapa_frontend.data.models.Book
+import com.example.bukuapa_frontend.data.models.Category
 import com.example.bukuapa_frontend.data.repositories.BookRepository
 import com.example.bukuapa_frontend.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,9 @@ class ManageBookViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _books = MutableStateFlow<List<Book>>(emptyList())
     val books: StateFlow<List<Book>> = _books
+
+    private val _categories = MutableStateFlow<List<Category>>(emptyList())
+    val categories: StateFlow<List<Category>> = _categories
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -40,6 +44,15 @@ class ManageBookViewModel(application: Application) : AndroidViewModel(applicati
                 _books.value = bookList
             }
             _isLoadingBooks.value = false
+        }
+    }
+
+    fun fetchCategories() {
+        viewModelScope.launch {
+            val token = tokenManager.getToken().firstOrNull() ?: return@launch
+            repository.getCategories(token).onSuccess { categoryList ->
+                _categories.value = categoryList
+            }
         }
     }
 

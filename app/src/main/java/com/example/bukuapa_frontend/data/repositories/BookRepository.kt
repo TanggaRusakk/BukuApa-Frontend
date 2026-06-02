@@ -2,6 +2,7 @@ package com.example.bukuapa_frontend.data.repositories
 
 import com.example.bukuapa_frontend.data.api.ApiClient
 import com.example.bukuapa_frontend.data.models.Book
+import com.example.bukuapa_frontend.data.models.Category
 import com.example.bukuapa_frontend.domain.protocols.BookRepositoryProtocol
 
 class BookRepository : BookRepositoryProtocol {
@@ -33,6 +34,14 @@ class BookRepository : BookRepositoryProtocol {
         return try {
             ApiClient.instance.deleteBook("Bearer $token", bookId)
             Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getCategories(token: String): Result<List<Category>> {
+        return try {
+            Result.success(ApiClient.instance.getCategories("Bearer $token").data)
         } catch (e: Exception) {
             Result.failure(e)
         }
