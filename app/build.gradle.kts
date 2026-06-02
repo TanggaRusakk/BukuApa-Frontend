@@ -5,16 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.bukuapa_frontend"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.bukuapa_frontend"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
