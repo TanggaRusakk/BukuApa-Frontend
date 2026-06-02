@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.lifecycle.runtime.testing)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -60,18 +63,30 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
-// --- Kebutuhan Ikon Visual Tambahan ---
+    // Kebutuhan Ikon Visual Tambahan
     implementation("androidx.compose.material:material-icons-core:1.6.7")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
 
-// --- Kebutuhan Penyimpanan Data Lokal (Token) ---
+    // Kebutuhan Penyimpanan Data Lokal (Token)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-// --- Kebutuhan Keamanan (Decode JWT) ---
+    // Kebutuhan Keamanan (Decode JWT)
     implementation("com.auth0.android:jwtdecode:2.0.2")
 
-// --- Kebutuhan Jaringan (Menembak API Backend) ---
+    // Kebutuhan Jaringan (Menembak API Backend)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
+    // Kebutuhan Unit Testing
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.11")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+
+    // 🌟 (Opsional tapi disarankan) Untuk testing arsitektur Android seperti ViewModel / LiveData
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    
+    // Untuk instrumented tests
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
 }
