@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,12 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.bukuapa_frontend.data.models.Book
 
 @Composable
@@ -35,17 +34,22 @@ fun BookCard(
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
-            // Gambar Cover dengan ratio yang pas
-            AsyncImage(
-                model = book.coverUrl,
-                contentDescription = "Cover ${book.title}",
+            // Placeholder Cover Buku
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(0.7f) // Portrait ratio
+                    .aspectRatio(0.7f)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF0F2F5)),
-                contentScale = ContentScale.Crop
-            )
+                    .background(Color(0xFFF1F5F9)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Book,
+                    contentDescription = null,
+                    tint = Color(0xFF94A3B8),
+                    modifier = Modifier.size(48.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(10.dp))
 

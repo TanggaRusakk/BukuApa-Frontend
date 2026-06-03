@@ -49,9 +49,6 @@ interface ApiService {
         @Path("bookId") bookId: Int
     ): ApiResponse<Any>
 
-    @GET("categories")
-    suspend fun getCategories(@Header("Authorization") token: String): ApiResponse<List<Category>>
-
     @GET("loans")
     suspend fun getLoans(@Header("Authorization") token: String): ApiResponse<List<Loan>>
 
