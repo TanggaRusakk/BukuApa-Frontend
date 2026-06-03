@@ -1,8 +1,13 @@
 package com.example.bukuapa_frontend.data.api
 
 import com.example.bukuapa_frontend.data.models.Book
+import com.example.bukuapa_frontend.data.models.CanReviewResponse
 import com.example.bukuapa_frontend.data.models.Category
+import com.example.bukuapa_frontend.data.models.CreateReviewRequest
 import com.example.bukuapa_frontend.data.models.Loan
+import com.example.bukuapa_frontend.data.models.Review
+import com.example.bukuapa_frontend.data.models.ReviewListResponse
+import com.example.bukuapa_frontend.data.models.UpdateReviewRequest
 import com.example.bukuapa_frontend.data.models.User
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -57,6 +62,38 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("loanId") loanId: Int
     ): ApiResponse<Loan>
+
+    @GET("books/{bookId}/reviews")
+    suspend fun getReviews(
+        @Path("bookId") bookId: Int,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 20
+    ): ApiResponse<ReviewListResponse>
+
+    @POST("reviews")
+    suspend fun createReview(
+        @Header("Authorization") token: String,
+        @Body request: CreateReviewRequest
+    ): ApiResponse<Review>
+
+    @PUT("reviews/{reviewId}")
+    suspend fun updateReview(
+        @Header("Authorization") token: String,
+        @Path("reviewId") reviewId: Int,
+        @Body request: UpdateReviewRequest
+    ): ApiResponse<Review>
+
+    @DELETE("reviews/{reviewId}")
+    suspend fun deleteReview(
+        @Header("Authorization") token: String,
+        @Path("reviewId") reviewId: Int
+    ): ApiResponse<Any>
+
+    @GET("books/{bookId}/can-review")
+    suspend fun canReview(
+        @Header("Authorization") token: String,
+        @Path("bookId") bookId: Int
+    ): ApiResponse<CanReviewResponse>
 }
 
 object ApiClient {
