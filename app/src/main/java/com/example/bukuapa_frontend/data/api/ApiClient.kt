@@ -2,6 +2,7 @@ package com.example.bukuapa_frontend.data.api
 
 import com.example.bukuapa_frontend.data.models.Book
 import com.example.bukuapa_frontend.data.models.Category
+import com.example.bukuapa_frontend.data.models.Loan
 import com.example.bukuapa_frontend.data.models.User
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -19,8 +20,15 @@ interface ApiService {
     @GET("users/me")
     suspend fun getCurrentUser(@Header("Authorization") token: String): ApiResponse<User>
 
+    @GET("categories")
+    suspend fun getCategories(@Header("Authorization") token: String): ApiResponse<List<Category>>
+
     @GET("books")
-    suspend fun getBooks(@Header("Authorization") token: String): ApiResponse<List<Book>>
+    suspend fun getBooks(
+        @Header("Authorization") token: String,
+        @Query("search") search: String? = null,
+        @Query("category") categoryId: Int? = null
+    ): ApiResponse<List<Book>>
 
     @POST("books")
     suspend fun createBook(
@@ -43,6 +51,15 @@ interface ApiService {
 
     @GET("categories")
     suspend fun getCategories(@Header("Authorization") token: String): ApiResponse<List<Category>>
+
+    @GET("loans")
+    suspend fun getLoans(@Header("Authorization") token: String): ApiResponse<List<Loan>>
+
+    @POST("loans/{loanId}/extend")
+    suspend fun extendLoan(
+        @Header("Authorization") token: String,
+        @Path("loanId") loanId: Int
+    ): ApiResponse<Loan>
 }
 
 object ApiClient {

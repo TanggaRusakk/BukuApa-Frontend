@@ -141,19 +141,19 @@ fun AppNavigation() {
 
             composable(Screen.Catalog.route) {
                 CatalogView(
+                    role = userRole,
                     onNavigate = { route ->
                         navController.navigate(route)
-                    },
-                    role = userRole
+                    }
                 )
             }
 
             composable(Screen.Borrowing.route) {
                 BorrowingView(
+                    role = userRole,
                     onNavigate = { route ->
                         navController.navigate(route)
-                    },
-                    role = userRole
+                    }
                 )
             }
 

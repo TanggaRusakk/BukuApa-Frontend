@@ -10,5 +10,7 @@ data class Book(
     val totalPages: Int = 0,
     val stock: Int = 0,
     val categories: List<Category>? = null,
-    val categoryIds: List<Int>? = null
+    val categoryIds: List<Int>? = null,
+    val rating: Double = 0.0,
+    val coverUrl: String? = null
 )
