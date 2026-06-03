@@ -23,6 +23,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     val errorMessage: StateFlow<String?> = _errorMessage
 
     fun login(email: String, sandi: String) {
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _errorMessage.value = "Format email tidak valid."
+            return
+        }
+        if (sandi.length < 8) {
+            _errorMessage.value = "Kata sandi minimal 8 karakter."
+            return
+        }
+
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null

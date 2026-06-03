@@ -11,58 +11,60 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.bukuapa_frontend.data.models.Book
 
 @Composable
 fun BookCard(
     book: Book,
-    // Dummy rating
-    rating: Double = 4.8,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(4.dp), // Jarak antar card di dalam grid
-        shape = RoundedCornerShape(12.dp),
+            .padding(6.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp) // Efek bayangan tipis ala desain
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(10.dp)
         ) {
-            // Kotak abu-abu buat Placeholder Gambar Cover
-            // (Nanti bisa diganti Coil AsyncImage kalau udah nyambung backend beneran)
-            Box(
+            // Gambar Cover dengan ratio yang pas
+            AsyncImage(
+                model = book.coverUrl,
+                contentDescription = "Cover ${book.title}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE0E0E0))
+                    .aspectRatio(0.7f) // Portrait ratio
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFFF0F2F5)),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Judul Buku
             Text(
                 text = book.title.ifEmpty { "Judul Buku" },
                 fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = Color.Black,
-                maxLines = 2,
+                fontSize = 15.sp,
+                color = Color(0xFF1A1C1E),
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             // Penulis
             Text(
                 text = book.author.ifEmpty { "Nama Penulis" },
-                color = Color.Gray,
+                color = Color(0xFF74777F),
                 fontSize = 12.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -76,31 +78,36 @@ fun BookCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Rating (Bintang + Angka)
+                // Rating
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "Rating",
-                        tint = Color(0xFFFFC107), // Kuning Emas
+                        tint = Color(0xFFFFB900), // Warna Gold lebih solid
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = rating.toString(),
+                        text = if (book.rating > 0) String.format("%.1f", book.rating) else "4.8",
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
-                        color = Color.DarkGray
+                        color = Color(0xFF44474E)
                     )
                 }
 
                 // Status Stok
-                Text(
-                    text = "Stok ${book.stock}",
-                    // Hijau kalau ada stok, Merah kalau kosong
-                    color = if (book.stock > 0) Color(0xFF4CAF50) else Color(0xFFF44336),
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 12.sp
-                )
+                Surface(
+                    color = if (book.stock > 0) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Text(
+                        text = "Stok ${book.stock}",
+                        color = if (book.stock > 0) Color(0xFF2E7D32) else Color(0xFFC62828),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
             }
         }
     }

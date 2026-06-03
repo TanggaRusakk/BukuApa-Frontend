@@ -2,11 +2,9 @@ package com.example.bukuapa_frontend.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -16,10 +14,11 @@ import com.example.bukuapa_frontend.data.models.Book
 import com.example.bukuapa_frontend.ui.views.auth.AccountView
 import com.example.bukuapa_frontend.ui.views.auth.LoginView
 import com.example.bukuapa_frontend.ui.views.auth.RegisterView
+import com.example.bukuapa_frontend.ui.views.book.CatalogView
 import com.example.bukuapa_frontend.ui.views.book.CreateUpdateBookView
 import com.example.bukuapa_frontend.ui.views.book.ManageBookView
+import com.example.bukuapa_frontend.ui.views.borrowing.BorrowingView
 import com.example.bukuapa_frontend.ui.views.components.BottomNavigatorBar
-import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
 import com.example.bukuapa_frontend.utils.TokenManager
 import kotlinx.coroutines.launch
 
@@ -138,37 +137,21 @@ fun AppNavigation() {
             }
 
             composable(Screen.Catalog.route) {
-                Scaffold(
-                    topBar = {
-                        TopNavigatorBar(
-                            title = "Katalog Buku"
-                        )
+                CatalogView(
+                    role = userRole,
+                    onNavigate = { route ->
+                        navController.navigate(route)
                     }
-                ) { padding ->
-                    Text(
-                        "Halaman Katalog (Member)",
-                        modifier = Modifier
-                            .padding(padding)
-                            .padding(16.dp)
-                    )
-                }
+                )
             }
 
             composable(Screen.Borrowing.route) {
-                Scaffold(
-                    topBar = {
-                        TopNavigatorBar(
-                            title = "Peminjaman",
-                        )
+                BorrowingView(
+                    role = userRole,
+                    onNavigate = { route ->
+                        navController.navigate(route)
                     }
-                ) { padding ->
-                    Text(
-                        "Halaman Peminjaman",
-                        modifier = Modifier
-                            .padding(padding)
-                            .padding(16.dp)
-                    )
-                }
+                )
             }
 
             composable(Screen.Account.route) {

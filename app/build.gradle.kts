@@ -31,8 +31,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+        }
     }
     buildFeatures {
         compose = true
@@ -49,6 +51,27 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.concurrent.futures)
+    implementation(libs.coil.compose)
+    
+    // --- Kebutuhan Arsitektur UI (ViewModel & Navigasi) ---
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+
+    // --- Kebutuhan Ikon Visual Tambahan ---
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
+
+    // --- Kebutuhan Penyimpanan Data Lokal (Token) ---
+    implementation(libs.androidx.datastore.preferences)
+
+    // --- Kebutuhan Keamanan (Decode JWT) ---
+    implementation(libs.auth0.jwtdecode)
+
+    // --- Kebutuhan Jaringan (Menembak API Backend) ---
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -56,23 +79,4 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
-
-// --- Kebutuhan Arsitektur UI (ViewModel & Navigasi) ---
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-
-// --- Kebutuhan Ikon Visual Tambahan ---
-    implementation("androidx.compose.material:material-icons-core:1.6.7")
-    implementation("androidx.compose.material:material-icons-extended:1.6.7")
-
-// --- Kebutuhan Penyimpanan Data Lokal (Token) ---
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-
-// --- Kebutuhan Keamanan (Decode JWT) ---
-    implementation("com.auth0.android:jwtdecode:2.0.2")
-
-// --- Kebutuhan Jaringan (Menembak API Backend) ---
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
