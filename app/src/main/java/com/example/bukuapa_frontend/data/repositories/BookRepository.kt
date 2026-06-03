@@ -4,13 +4,14 @@ import com.example.bukuapa_frontend.data.api.ApiClient
 import com.example.bukuapa_frontend.data.models.Book
 import com.example.bukuapa_frontend.data.models.Category
 import com.example.bukuapa_frontend.domain.protocols.BookRepositoryProtocol
+import com.example.bukuapa_frontend.utils.NetworkUtils
 
 class BookRepository : BookRepositoryProtocol {
     override suspend fun getBooks(token: String): Result<List<Book>> {
         return try {
             Result.success(ApiClient.instance.getBooks("Bearer $token").data)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(NetworkUtils.parseError(e, "Ambil data buku")))
         }
     }
 
@@ -18,7 +19,7 @@ class BookRepository : BookRepositoryProtocol {
         return try {
             Result.success(ApiClient.instance.createBook("Bearer $token", book).data)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(NetworkUtils.parseError(e, "Tambah buku")))
         }
     }
 
@@ -26,7 +27,7 @@ class BookRepository : BookRepositoryProtocol {
         return try {
             Result.success(ApiClient.instance.updateBook("Bearer $token", bookId, book).data)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(NetworkUtils.parseError(e, "Update buku")))
         }
     }
 
@@ -35,7 +36,7 @@ class BookRepository : BookRepositoryProtocol {
             ApiClient.instance.deleteBook("Bearer $token", bookId)
             Result.success(true)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(NetworkUtils.parseError(e, "Hapus buku")))
         }
     }
 
@@ -43,7 +44,7 @@ class BookRepository : BookRepositoryProtocol {
         return try {
             Result.success(ApiClient.instance.getCategories("Bearer $token").data)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.failure(Exception(NetworkUtils.parseError(e, "Ambil kategori")))
         }
     }
 }

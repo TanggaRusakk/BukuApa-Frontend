@@ -68,8 +68,8 @@ class CatalogViewModel(application: Application) : AndroidViewModel(application)
             
             repository.getBooks(token, search, filterCategoryId).onSuccess {
                 _books.value = it
-            }.onFailure {
-                _errorMessage.value = "Gagal memuat buku."
+            }.onFailure { error ->
+                _errorMessage.value = error.message ?: "Gagal memuat buku."
             }
             _isLoading.value = false
         }

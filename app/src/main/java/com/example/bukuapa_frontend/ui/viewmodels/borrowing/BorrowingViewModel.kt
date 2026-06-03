@@ -36,8 +36,8 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
 
             repository.getLoans(token).onSuccess {
                 _loans.value = it
-            }.onFailure {
-                _errorMessage.value = "Gagal memuat riwayat peminjaman."
+            }.onFailure { error ->
+                _errorMessage.value = error.message ?: "Gagal memuat riwayat peminjaman."
             }
             _isLoading.value = false
         }
