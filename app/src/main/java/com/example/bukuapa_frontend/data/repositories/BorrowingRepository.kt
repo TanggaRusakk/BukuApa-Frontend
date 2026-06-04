@@ -10,7 +10,7 @@ class BorrowingRepository {
             val response = ApiClient.instance.getLoans("Bearer $token")
             Result.success(response.data)
         } catch (e: Exception) {
-            Result.failure(Exception(NetworkUtils.parseError(e, "Ambil data pinjaman")))
+            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Ambil data pinjaman")))
         }
     }
 
@@ -19,7 +19,16 @@ class BorrowingRepository {
             val response = ApiClient.instance.extendLoan("Bearer $token", loanId)
             Result.success(response.data)
         } catch (e: Exception) {
-            Result.failure(Exception(NetworkUtils.parseError(e, "Perpanjang pinjaman")))
+            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Perpanjang pinjaman")))
+        }
+    }
+
+    suspend fun createLoan(token: String, bookId: Int): Result<Loan> {
+        return try {
+            val response = ApiClient.instance.createLoan("Bearer $token", mapOf("bookId" to bookId))
+            Result.success(response.data)
+        } catch (e: Exception) {
+            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Buat peminjaman")))
         }
     }
 }

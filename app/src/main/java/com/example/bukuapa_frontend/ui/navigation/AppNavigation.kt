@@ -20,6 +20,7 @@ import com.example.bukuapa_frontend.ui.views.book.CatalogView
 import com.example.bukuapa_frontend.ui.views.book.CreateUpdateBookView
 import com.example.bukuapa_frontend.ui.views.book.ManageBookView
 import com.example.bukuapa_frontend.ui.views.borrowing.BorrowingView
+import com.example.bukuapa_frontend.ui.views.borrowing.CreateLoanView
 import com.example.bukuapa_frontend.ui.views.components.BottomNavigatorBar
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
 import com.example.bukuapa_frontend.utils.TokenManager
@@ -63,7 +64,8 @@ fun AppNavigation() {
     val hideBottomBarRoutes = listOf(
         Screen.Login.route,
         Screen.Register.route,
-        Screen.CreateUpdateBook.route
+        Screen.CreateUpdateBook.route,
+        Screen.CreateLoan.route
     )
     val showBottomBar = currentRoute != null && currentRoute !in hideBottomBarRoutes
 
@@ -151,9 +153,16 @@ fun AppNavigation() {
             composable(Screen.Borrowing.route) {
                 BorrowingView(
                     role = userRole,
-                    onNavigate = { route ->
-                        navController.navigate(route)
+                    onNavigateToCreate = {
+                        navController.navigate(Screen.CreateLoan.route)
                     }
+                )
+            }
+
+            composable(Screen.CreateLoan.route) {
+                CreateLoanView(
+                    onBackClick = { navController.popBackStack() },
+                    onSaveSuccess = { navController.popBackStack() }
                 )
             }
 

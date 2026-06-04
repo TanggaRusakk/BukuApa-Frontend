@@ -54,10 +54,16 @@ interface ApiService {
         @Path("bookId") bookId: Int
     ): ApiResponse<Any>
 
-    @GET("loans")
+    @GET("borrowings")
     suspend fun getLoans(@Header("Authorization") token: String): ApiResponse<List<Loan>>
 
-    @POST("loans/{loanId}/extend")
+    @POST("borrowings")
+    suspend fun createLoan(
+        @Header("Authorization") token: String,
+        @Body request: Map<String, Int>
+    ): ApiResponse<Loan>
+
+    @POST("borrowings/{loanId}/extend")
     suspend fun extendLoan(
         @Header("Authorization") token: String,
         @Path("loanId") loanId: Int
