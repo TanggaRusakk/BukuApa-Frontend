@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bukuapa_frontend.data.models.Loan
 import com.example.bukuapa_frontend.data.repositories.BorrowingRepository
+import com.example.bukuapa_frontend.data.repositories.CatalogRepository
 import com.example.bukuapa_frontend.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class BorrowingViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = BorrowingRepository()
+    private val catalogRepository = CatalogRepository()
     private val tokenManager = TokenManager(application)
 
     private val _loans = MutableStateFlow<List<Loan>>(emptyList())
@@ -54,6 +56,35 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
                 _errorMessage.value = error.message ?: "Gagal memperpanjang pinjaman."
             }
             _isLoading.value = false
+        }
+    }
+
+    fun createLoanByIsbn(isbn: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val token = tokenManager.getToken().first() ?: return@launch
+
+            // 1. Cari buku berdasarkan ISBN
+            catalogRepository.getBooks(token, search = isbn).onSuccess { books ->
+                val book = books.find { it.isbn == isbn }
+                if (book != null) {
+                    // 2. Jika ketemu, buat peminjaman pake bookId
+                    repository.createLoan(token, book.id).onSuccess {
+                        _isLoading.value = false
+                        loadLoans()
+                        onSuccess()
+                    }.onFailure { error ->
+                        _isLoading.value = false
+                        onError(error.message ?: "Gagal membuat peminjaman")
+                    }
+                } else {
+                    _isLoading.value = false
+                    onError("Buku dengan ISBN tersebut tidak ditemukan.")
+                }
+            }.onFailure { error ->
+                _isLoading.value = false
+                onError(error.message ?: "Gagal mencari buku.")
+            }
         }
     }
 }
