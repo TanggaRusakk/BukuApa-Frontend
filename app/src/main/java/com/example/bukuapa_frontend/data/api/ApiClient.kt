@@ -61,7 +61,8 @@ interface ApiService {
     @PATCH("borrowings/{loanId}/return")
     suspend fun returnLoan(
         @Header("Authorization") token: String,
-        @Path("loanId") loanId: Int
+        @Path("loanId") loanId: Int,
+        @Body emptyBody: Map<String, String> = emptyMap()
     ): ApiResponse<Loan>
 
     @POST("borrowings/{loanId}/extend")

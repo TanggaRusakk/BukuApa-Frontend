@@ -25,17 +25,18 @@ class BorrowingRepository {
 
     suspend fun returnLoan(token: String, loanId: Int): Result<Loan> {
         return try {
-            val response = ApiClient.instance.returnLoan(token, loanId)
+            // FIX: Tambahin "Bearer " biar token JWT-nya kebaca valid oleh backend
+            val response = ApiClient.instance.returnLoan("Bearer $token", loanId)
             Result.success(response.data)
         } catch (e: Exception) {
-            Result.failure(Exception("Gagal mengembalikan buku"))
+            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Mengembalikan buku")))
         }
     }
 
     suspend fun createLoanForUser(token: String, userId: Int, bookId: Int): Result<Loan> {
         return try {
             val response = ApiClient.instance.createLoan(
-                "Bearer $token", 
+                "Bearer $token",
                 mapOf("userId" to userId, "bookId" to bookId)
             )
             Result.success(response.data)
