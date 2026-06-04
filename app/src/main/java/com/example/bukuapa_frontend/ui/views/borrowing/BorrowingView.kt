@@ -62,7 +62,7 @@ fun BorrowingView(
                 .padding(paddingValues)
                 .padding(horizontal = 20.dp)
         ) {
-            // Tampilan kalau ada error dari API
+            // Tampilan error (jika ada)
             if (errorMessage != null) {
                 Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
                     Text(text = "Error: $errorMessage", color = Color.Red, fontWeight = FontWeight.Bold)
@@ -88,7 +88,12 @@ fun BorrowingView(
                     contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
                 ) {
                     items(loans) { loan ->
-                        BorrowingItemCard(loan, onExtend = { viewModel.extendLoan(it) })
+                        BorrowingItemCard(
+                            loan = loan,
+                            role = role,
+                            onExtend = { viewModel.extendLoan(it) },
+                            onReturn = { viewModel.returnLoan(it) } // Aksi return disambungin ke ViewModel
+                        )
                     }
                 }
             }
@@ -97,12 +102,12 @@ fun BorrowingView(
 }
 
 @Composable
-fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
+fun BorrowingItemCard(loan: Loan, role: String, onExtend: (Int) -> Unit, onReturn: (Int) -> Unit) {
     // Mengambil data dari nested object 'book' dan 'user' hasil include di backend
     val bookTitle = loan.book?.title ?: "Buku ID: ${loan.bookId}"
     val bookAuthor = loan.book?.author ?: "Penulis tidak diketahui"
     val bookCoverUrl = loan.book?.coverUrl
-    val borrowerName = loan.user?.name
+    val borrowerName = loan.user?.name ?: "User ID: ${loan.userId}" // Fallback kalau nama kosong
 
     val statusText = when (loan.status) {
         "BORROWED" -> "Sedang Dipinjam"
@@ -154,15 +159,27 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = bookAuthor, color = Color(0xFF64748B), fontSize = 13.sp)
-                                if (!borrowerName.isNullOrBlank()) {
+                            // FIX TEKS VERTIKAL: Pake Modifier.weight biar kepotong rapi
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = bookAuthor,
+                                    color = Color(0xFF64748B),
+                                    fontSize = 13.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f, fill = false)
+                                )
+                                // Kalau Staff, tampilin nama Peminjamnya
+                                if (role == "STAFF") {
                                     Text(text = " • ", color = Color.LightGray)
                                     Text(
                                         text = borrowerName,
                                         color = Color(0xFF0D47A1),
                                         fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f, fill = false)
                                     )
                                 }
                             }
@@ -192,6 +209,7 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
+                        // Bersihkan format tanggal jika perlu
                         val displayBorrowDate = loan.borrowDate.split("T").firstOrNull() ?: loan.borrowDate
                         Text(text = "Pinjam: $displayBorrowDate", color = Color(0xFF475569), fontSize = 12.sp)
                     }
@@ -214,6 +232,7 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
             HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp)
             Spacer(modifier = Modifier.height(12.dp))
 
+            // FIX TOMBOL BAWAH
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -226,20 +245,38 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
                     fontWeight = FontWeight.Medium
                 )
 
-                Button(
-                    onClick = { onExtend(loan.id) },
-                    enabled = loan.status == "BORROWED" && loan.extensionCount < 2,
-                    shape = RoundedCornerShape(24.dp),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-                    modifier = Modifier.height(36.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF0D47A1),
-                        contentColor = Color.White,
-                        disabledContainerColor = Color(0xFFE2E8F0),
-                        disabledContentColor = Color(0xFF94A3B8)
-                    )
-                ) {
-                    Text("Perpanjang", fontSize = 13.sp, fontWeight = FontWeight.ExtraBold)
+                // Kumpulan Tombol di sebelah kanan
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Tombol Kembalikan (Khusus Staff & Kalau statusnya masih dipinjam/terlambat)
+                    if (role == "STAFF" && loan.status != "RETURNED") {
+                        OutlinedButton(
+                            onClick = { onReturn(loan.id) },
+                            shape = RoundedCornerShape(24.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                            modifier = Modifier.height(36.dp)
+                        ) {
+                            Text("Kembalikan", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    // Tombol Perpanjang (Khusus User & Jatah masih ada)
+                    if (role != "STAFF") {
+                        Button(
+                            onClick = { onExtend(loan.id) },
+                            enabled = loan.status == "BORROWED" && loan.extensionCount < 2,
+                            shape = RoundedCornerShape(24.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                            modifier = Modifier.height(36.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF0D47A1),
+                                contentColor = Color.White,
+                                disabledContainerColor = Color(0xFFE2E8F0),
+                                disabledContentColor = Color(0xFF94A3B8)
+                            )
+                        ) {
+                            Text("Perpanjang", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                        }
+                    }
                 }
             }
         }

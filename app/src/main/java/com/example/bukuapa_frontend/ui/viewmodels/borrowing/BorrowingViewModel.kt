@@ -60,6 +60,20 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    fun returnLoan(loanId: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val token = tokenManager.getToken().first() ?: return@launch
+
+            repository.returnLoan(token, loanId).onSuccess {
+                loadLoans() // Refresh data setelah berhasil
+            }.onFailure { error ->
+                _errorMessage.value = error.message ?: "Gagal mengembalikan buku."
+            }
+            _isLoading.value = false
+        }
+    }
+
     fun createLoanByIsbnForUser(userId: Int, isbn: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true

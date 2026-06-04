@@ -23,6 +23,15 @@ class BorrowingRepository {
         }
     }
 
+    suspend fun returnLoan(token: String, loanId: Int): Result<Loan> {
+        return try {
+            val response = ApiClient.instance.returnLoan(token, loanId)
+            Result.success(response.data)
+        } catch (e: Exception) {
+            Result.failure(Exception("Gagal mengembalikan buku"))
+        }
+    }
+
     suspend fun createLoanForUser(token: String, userId: Int, bookId: Int): Result<Loan> {
         return try {
             val response = ApiClient.instance.createLoan(
