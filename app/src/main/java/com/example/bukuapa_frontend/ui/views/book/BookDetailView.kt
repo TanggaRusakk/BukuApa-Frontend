@@ -16,12 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.bukuapa_frontend.data.models.Review
+import com.example.bukuapa_frontend.data.repositories.ReviewRepository
 import com.example.bukuapa_frontend.ui.viewmodels.book.BookDetailViewModel
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
+import com.example.bukuapa_frontend.ui.views.review.AddReviewDialog
+import com.example.bukuapa_frontend.ui.views.review.EditReviewDialog
+import com.example.bukuapa_frontend.ui.views.review.ReviewView
+import com.example.bukuapa_frontend.utils.TokenManager
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +41,16 @@ fun BookDetailView(
     val book by viewModel.book.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.errorMessage.collectAsState()
+
+    val context = LocalContext.current
+    val reviewService = remember { ReviewRepository(TokenManager(context)) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    var showReviewDialog by remember { mutableStateOf(false) }
+    var editingReview by remember { mutableStateOf<Review?>(null) }
+    var reviewToDelete by remember { mutableStateOf<Review?>(null) }
+    var refreshKey by remember { mutableStateOf(0) }
 
     LaunchedEffect(bookId) {
         viewModel.fetchBookDetail(bookId)
@@ -50,6 +68,7 @@ fun BookDetailView(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = Color(0xFFF8FAFC)
     ) { padding ->
         if (isLoading) {
@@ -143,9 +162,96 @@ fun BookDetailView(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(32.dp))
+                    HorizontalDivider(thickness = 1.dp, color = Color(0xFFE2E8F0))
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        "Ulasan Pengguna",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1E293B),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Box(modifier = Modifier.height(600.dp)) {
+                        key(refreshKey) {
+                            ReviewView(
+                                bookId = bookId,
+                                service = reviewService,
+                                onShowSnackbar = { message ->
+                                    scope.launch { snackbarHostState.showSnackbar(message) }
+                                },
+                                onWriteReview = { showReviewDialog = true },
+                                onEditReview = { editingReview = it },
+                                onDeleteReview = { reviewToDelete = it }
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(40.dp))
                 }
             }
+        }
+        
+        if (showReviewDialog) {
+            AddReviewDialog(
+                bookId = bookId,
+                service = reviewService,
+                onDismiss = { showReviewDialog = false },
+                onSuccess = {
+                    showReviewDialog = false
+                    refreshKey++
+                    scope.launch { snackbarHostState.showSnackbar("Ulasan berhasil ditambahkan") }
+                }
+            )
+        }
+
+        if (editingReview != null) {
+            EditReviewDialog(
+                review = editingReview!!,
+                service = reviewService,
+                onDismiss = { editingReview = null },
+                onSuccess = {
+                    editingReview = null
+                    refreshKey++
+                    scope.launch { snackbarHostState.showSnackbar("Ulasan berhasil diperbarui") }
+                }
+            )
+        }
+
+        if (reviewToDelete != null) {
+            AlertDialog(
+                onDismissRequest = { reviewToDelete = null },
+                title = { Text("Hapus Ulasan") },
+                text = { Text("Apakah Anda yakin ingin menghapus ulasan ini?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            val id = reviewToDelete!!.id
+                            reviewToDelete = null
+                            scope.launch {
+                                val result = reviewService.deleteReview(id)
+                                if (result.isSuccess) {
+                                    refreshKey++
+                                    snackbarHostState.showSnackbar("Ulasan berhasil dihapus")
+                                } else {
+                                    snackbarHostState.showSnackbar("Gagal menghapus ulasan")
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Hapus")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { reviewToDelete = null }) {
+                        Text("Batal")
+                    }
+                }
+            )
         }
     }
 }

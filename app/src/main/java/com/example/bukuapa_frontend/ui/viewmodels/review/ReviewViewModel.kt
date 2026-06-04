@@ -3,6 +3,7 @@ package com.example.bukuapa_frontend.ui.viewmodels.review
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bukuapa_frontend.data.models.*
+import com.example.bukuapa_frontend.data.repositories.UserRepository
 import com.example.bukuapa_frontend.domain.protocols.ReviewServiceProtocol
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,12 +13,16 @@ import kotlinx.coroutines.launch
 class ReviewViewModel(
     private val reviewService: ReviewServiceProtocol
 ) : ViewModel() {
+    private val userRepository = UserRepository()
 
     private val _uiState = MutableStateFlow<ReviewUiState>(ReviewUiState.Loading)
     val uiState: StateFlow<ReviewUiState> = _uiState.asStateFlow()
 
     private val _canReview = MutableStateFlow(false)
     val canReview: StateFlow<Boolean> = _canReview.asStateFlow()
+
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     private var currentBookId: Int? = null
 
@@ -88,6 +93,14 @@ class ReviewViewModel(
             reviewService.canReview(bookId)
                 .onSuccess { canReview -> _canReview.value = canReview }
                 .onFailure { _canReview.value = false }
+        }
+    }
+
+    fun fetchCurrentUser(token: String) {
+        viewModelScope.launch {
+            userRepository.getCurrentUser(token).onSuccess {
+                _currentUser.value = it
+            }
         }
     }
 

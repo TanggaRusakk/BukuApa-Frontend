@@ -89,9 +89,10 @@ interface ApiService {
         @Query("limit") limit: Int = 20
     ): ApiResponse<ReviewListResponse>
 
-    @POST("reviews")
+    @POST("books/{bookId}/reviews")
     suspend fun createReview(
         @Header("Authorization") token: String,
+        @Path("bookId") bookId: Int,
         @Body request: CreateReviewRequest
     ): ApiResponse<Review>
 

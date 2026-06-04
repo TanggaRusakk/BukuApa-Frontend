@@ -3,11 +3,16 @@ package com.example.bukuapa_frontend.ui.views.review
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -16,13 +21,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bukuapa_frontend.data.models.Review
 import com.example.bukuapa_frontend.domain.protocols.ReviewServiceProtocol
 import com.example.bukuapa_frontend.ui.viewmodels.review.ReviewViewModel
+import com.example.bukuapa_frontend.utils.TokenManager
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun ReviewView(
     bookId: Int,
     service: ReviewServiceProtocol,
     onShowSnackbar: (String) -> Unit = {},
-    onWriteReview: () -> Unit = {}
+    onWriteReview: () -> Unit = {},
+    onEditReview: (Review) -> Unit = {},
+    onDeleteReview: (Review) -> Unit = {}
 ) {
     val viewModel: ReviewViewModel = viewModel {
         ReviewViewModel(service)
@@ -30,9 +39,17 @@ fun ReviewView(
 
     val uiState by viewModel.uiState.collectAsState()
     val canReview by viewModel.canReview.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
+
+    val context = LocalContext.current
+    val tokenManager = remember { TokenManager(context) }
 
     LaunchedEffect(bookId) {
         viewModel.loadReviews(bookId)
+        tokenManager.getToken().first()?.let { viewModel.fetchCurrentUser(it) }
+    }
+
+    LaunchedEffect(bookId, currentUser) {
         viewModel.checkCanReview(bookId)
     }
 
@@ -55,7 +72,9 @@ fun ReviewView(
                         ReviewItem(
                             review = review,
                             formattedDate = viewModel.formatDate(review.createdAt),
-                            isOwner = false
+                            isOwner = currentUser?.id == review.user.id,
+                            onEdit = { onEditReview(review) },
+                            onDelete = { onDeleteReview(review) }
                         )
                     }
                     if (state.data.pagination.page < state.data.pagination.totalPages) {
@@ -149,8 +168,12 @@ private fun ReviewHeader(
 private fun ReviewItem(
     review: Review,
     formattedDate: String,
-    isOwner: Boolean
+    isOwner: Boolean,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -161,29 +184,67 @@ private fun ReviewItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = review.user.name,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = formattedDate,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    repeat(5) { index ->
-                        Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Filled.Star,
-                            contentDescription = null,
-                            tint = if (index < review.rating)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                            modifier = Modifier.size(20.dp)
+                    Column {
+                        Text(
+                            text = review.user.name,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
                         )
+                        Text(
+                            text = formattedDate,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        repeat(5) { index ->
+                            Icon(
+                                imageVector = Icons.Filled.Star,
+                                contentDescription = null,
+                                tint = if (index < review.rating)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+
+                    if (isOwner) {
+                        Box {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(Icons.Default.MoreVert, contentDescription = "Menu Opsi")
+                            }
+                            DropdownMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Edit") },
+                                    onClick = {
+                                        showMenu = false
+                                        onEdit()
+                                    },
+                                    leadingIcon = { Icon(Icons.Default.Edit, null) }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text("Hapus") },
+                                    onClick = {
+                                        showMenu = false
+                                        onDelete()
+                                    },
+                                    leadingIcon = { Icon(Icons.Default.Delete, null) },
+                                    colors = MenuDefaults.itemColors(
+                                        textColor = MaterialTheme.colorScheme.error,
+                                        leadingIconColor = MaterialTheme.colorScheme.error
+                                    )
+                                )
+                            }
+                        }
                     }
                 }
             }

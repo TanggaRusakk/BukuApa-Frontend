@@ -30,7 +30,7 @@ class ReviewRepository(
         return try {
             val token = tokenManager.getToken().first()
             val authHeader = "Bearer ${token ?: return Result.failure(Exception("Token tidak ditemukan"))}"
-            val response = apiService.createReview(authHeader, request)
+            val response = apiService.createReview(authHeader, request.bookId, request)
             Result.success(response.data)
         } catch (e: Exception) {
             Result.failure(e)
