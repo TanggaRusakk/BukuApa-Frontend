@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,11 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.bukuapa_frontend.data.models.Loan
 import com.example.bukuapa_frontend.ui.viewmodels.borrowing.BorrowingViewModel
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
@@ -63,6 +64,11 @@ fun BorrowingView(
         ) {
             // Tampilan error (jika ada)
             if (errorMessage != null) {
+                val displayError = if (errorMessage!!.contains("<!DOCTYPE html>")) {
+                    "Endpoint API belum di-deploy. Silahkan tunggu."
+                } else {
+                    errorMessage
+                }
                 Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
                     Text(text = "Error: $errorMessage", color = Color.Red, fontWeight = FontWeight.Bold)
                 }
@@ -105,7 +111,8 @@ fun BorrowingItemCard(loan: Loan, role: String, onExtend: (Int) -> Unit, onRetur
     // Mengambil data dari nested object 'book' dan 'user' hasil include di backend
     val bookTitle = loan.book?.title ?: "Buku ID: ${loan.bookId}"
     val bookAuthor = loan.book?.author ?: "Penulis tidak diketahui"
-    val borrowerName = loan.user?.name ?: "User ID: ${loan.userId}" // Fallback kalau nama kosong
+    val bookCoverUrl = loan.book?.coverUrl
+    val borrowerName = loan.user?.name ?: "User ID: ${loan.userId}"
 
     val statusText = when (loan.status) {
         "BORROWED" -> "Sedang Dipinjam"
