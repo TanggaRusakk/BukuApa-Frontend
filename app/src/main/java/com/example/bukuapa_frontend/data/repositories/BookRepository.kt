@@ -15,6 +15,15 @@ class BookRepository : BookRepositoryProtocol {
         }
     }
 
+    suspend fun getBookById(token: String, bookId: Int): Result<Book> {
+        return try {
+            val response = ApiClient.instance.getBookById("Bearer $token", bookId)
+            Result.success(response.data)
+        } catch (e: Exception) {
+            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Ambil detail buku")))
+        }
+    }
+
     override suspend fun createBook(token: String, book: Book): Result<Book> {
         return try {
             Result.success(ApiClient.instance.createBook("Bearer $token", book).data)
