@@ -26,6 +26,7 @@ import com.example.bukuapa_frontend.ui.views.components.BookCard
 @Composable
 fun CatalogView(
     onNavigate: (String) -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
     role: String = "USER",
     viewModel: CatalogViewModel = viewModel()
 ) {
@@ -152,7 +153,10 @@ fun CatalogView(
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
                 items(filteredBooks) { book ->
-                    BookCard(book = book)
+                    BookCard(
+                        book = book,
+                        onClick = { onNavigateToDetail(book.id) }
+                    )
                 }
             }
         }
