@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -104,8 +106,9 @@ fun CreateUpdateBookView(
             )
             CustomTextField(
                 value = isbn,
-                onValueChange = { isbn = it },
-                label = "ISBN Buku"
+                onValueChange = { if (it.all { char -> char.isDigit() }) isbn = it },
+                label = "ISBN Buku",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -165,8 +168,9 @@ fun CreateUpdateBookView(
                     )
                     CustomTextField(
                         value = publishedYear,
-                        onValueChange = { publishedYear = it },
-                        label = "Tahun"
+                        onValueChange = { if (it.all { char -> char.isDigit() }) publishedYear = it },
+                        label = "Tahun",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
 
@@ -180,8 +184,9 @@ fun CreateUpdateBookView(
                     )
                     CustomTextField(
                         value = totalPages,
-                        onValueChange = { totalPages = it },
-                        label = "Halaman"
+                        onValueChange = { if (it.all { char -> char.isDigit() }) totalPages = it },
+                        label = "Halaman",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
             }
@@ -196,8 +201,9 @@ fun CreateUpdateBookView(
             )
             CustomTextField(
                 value = stock,
-                onValueChange = { stock = it },
-                label = "Jumlah Stok"
+                onValueChange = { if (it.all { char -> char.isDigit() }) stock = it },
+                label = "Jumlah Stok",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             Spacer(modifier = Modifier.height(12.dp))
 
