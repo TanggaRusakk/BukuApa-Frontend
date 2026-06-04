@@ -36,6 +36,7 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
             _errorMessage.value = null
             val token = tokenManager.getToken().first() ?: return@launch
 
+            // Backend sudah mengatur filter role (Staff vs Member) di endpoint GET /borrowings
             repository.getLoans(token).onSuccess {
                 _loans.value = it
             }.onFailure { error ->
@@ -51,7 +52,7 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
             val token = tokenManager.getToken().first() ?: return@launch
 
             repository.extendLoan(token, loanId).onSuccess {
-                loadLoans() // Refresh list
+                loadLoans()
             }.onFailure { error ->
                 _errorMessage.value = error.message ?: "Gagal memperpanjang pinjaman."
             }
@@ -59,18 +60,29 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    fun createLoanByIsbn(isbn: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun returnLoan(loanId: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             val token = tokenManager.getToken().first() ?: return@launch
 
-            // 1. Cari buku berdasarkan ISBN
+            repository.returnLoan(token, loanId).onSuccess {
+                loadLoans() // Refresh data setelah berhasil
+            }.onFailure { error ->
+                _errorMessage.value = error.message ?: "Gagal mengembalikan buku."
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun createLoanByIsbnForUser(userId: Int, isbn: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val token = tokenManager.getToken().first() ?: return@launch
+
             catalogRepository.getBooks(token, search = isbn).onSuccess { books ->
-                val book = books.find { it.isbn == isbn }
+                val book = books.find { it.isbn.replace("-", "").trim() == isbn.replace("-", "").trim() }
                 if (book != null) {
-                    // 2. Jika ketemu, buat peminjaman pake bookId
-                    repository.createLoan(token, book.id).onSuccess {
-                        _isLoading.value = false
+                    repository.createLoanForUser(token, userId, book.id).onSuccess {
                         loadLoans()
                         onSuccess()
                     }.onFailure { error ->
@@ -79,7 +91,7 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
                     }
                 } else {
                     _isLoading.value = false
-                    onError("Buku dengan ISBN tersebut tidak ditemukan.")
+                    onError("Buku dengan ISBN $isbn tidak ditemukan.")
                 }
             }.onFailure { error ->
                 _isLoading.value = false
