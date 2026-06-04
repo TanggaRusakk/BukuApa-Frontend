@@ -49,28 +49,42 @@ fun LoginView(
             painter = painterResource(R.drawable.bukuapa),
             contentDescription = "Logo BukuApa",
             modifier = Modifier
-                .size(72.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .size(80.dp)
+                .clip(RoundedCornerShape(20.dp))
         )
 
         Spacer(Modifier.height(16.dp))
-        Text("BukuApa", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1158C4))
+        Text(
+            "BukuApa", 
+            fontSize = 32.sp, 
+            fontWeight = FontWeight.ExtraBold, 
+            color = Color(0xFF0D47A1)
+        )
+        Text(
+            "Perpustakaan digital di genggaman", 
+            fontSize = 14.sp, 
+            color = Color(0xFF64748B)
+        )
 
-        Spacer(Modifier.height(40.dp))
+        Spacer(Modifier.height(48.dp))
 
-        // 🌟 TEKS SELAMAT DATANG (Rata Kiri Sesuai Gambar)
+        // 🌟 TEKS SELAMAT DATANG
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 "Selamat Datang",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFF1E293B)
             )
-            Spacer(Modifier.height(4.dp))
-            Text("Masuk untuk meminjam buku favoritmu", fontSize = 14.sp, color = Color.Gray)
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "Masuk untuk meminjam buku favoritmu", 
+                fontSize = 15.sp, 
+                color = Color(0xFF64748B)
+            )
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(32.dp))
 
         // 🌟 TEXTFIELDS
         CustomTextField(
@@ -88,11 +102,23 @@ fun LoginView(
             isPassword = true
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(24.dp))
 
         if (error != null) {
-            Text(text = error!!, color = Color.Red, fontSize = 12.sp)
-            Spacer(Modifier.height(8.dp))
+            Surface(
+                color = Color(0xFFFFEBEE),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = error!!, 
+                    color = Color(0xFFC62828), 
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(12.dp),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            Spacer(Modifier.height(16.dp))
         }
 
         PrimaryButton(
@@ -105,12 +131,12 @@ fun LoginView(
         Spacer(Modifier.weight(1f))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Belum punya akun? ", color = Color.Gray, fontSize = 14.sp)
+            Text("Belum punya akun? ", color = Color(0xFF64748B), fontSize = 14.sp)
             TextButton(onClick = onNavigateToRegister, contentPadding = PaddingValues(0.dp)) {
                 Text(
                     "Daftar",
-                    color = Color(0xFF1158C4),
-                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0D47A1),
+                    fontWeight = FontWeight.ExtraBold,
                     fontSize = 14.sp
                 )
             }

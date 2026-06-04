@@ -30,7 +30,7 @@ fun CustomTextField(
         onValueChange = onValueChange,
         label = { Text(label) },
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         singleLine = true,
         visualTransformation = if (isPassword && !passwordVisible) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = if (isPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default,
@@ -49,7 +49,10 @@ fun CustomTextField(
             focusedBorderColor = Color(0xFF0D47A1),
             unfocusedBorderColor = Color(0xFFE2E8F0),
             focusedLabelColor = Color(0xFF0D47A1),
-            cursorColor = Color(0xFF0D47A1)
+            cursorColor = Color(0xFF0D47A1),
+            unfocusedLabelColor = Color(0xFF94A3B8),
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White
         )
     )
 }

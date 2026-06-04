@@ -33,6 +33,12 @@ fun BorrowingView(
 ) {
     val loans by viewModel.loans.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    // Force refresh setiap kali masuk ke screen ini
+    LaunchedEffect(Unit) {
+        viewModel.loadLoans()
+    }
 
     Scaffold(
         topBar = { TopNavigatorBar(title = "Riwayat Peminjaman") },
@@ -56,19 +62,30 @@ fun BorrowingView(
                 .padding(paddingValues)
                 .padding(horizontal = 20.dp)
         ) {
-            if (isLoading) {
+            // Tampilan kalau ada error dari API
+            if (errorMessage != null) {
+                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+                    Text(text = "Error: $errorMessage", color = Color.Red, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            if (isLoading && loans.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Color(0xFF0D47A1))
                 }
             } else if (loans.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Belum ada riwayat peminjaman", color = Color(0xFF64748B), fontWeight = FontWeight.Medium)
+                    Text(
+                        "Belum ada riwayat peminjaman",
+                        color = Color(0xFF64748B),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 24.dp)
+                    contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
                 ) {
                     items(loans) { loan ->
                         BorrowingItemCard(loan, onExtend = { viewModel.extendLoan(it) })
@@ -81,13 +98,19 @@ fun BorrowingView(
 
 @Composable
 fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
+    // Mengambil data dari nested object 'book' dan 'user' hasil include di backend
+    val bookTitle = loan.book?.title ?: "Buku ID: ${loan.bookId}"
+    val bookAuthor = loan.book?.author ?: "Penulis tidak diketahui"
+    val bookCoverUrl = loan.book?.coverUrl
+    val borrowerName = loan.user?.name
+
     val statusText = when (loan.status) {
         "BORROWED" -> "Sedang Dipinjam"
         "OVERDUE" -> "Terlambat"
         "RETURNED" -> "Dikembalikan"
         else -> loan.status
     }
-    
+
     val statusColor = when (loan.status) {
         "BORROWED" -> Color(0xFF2E7D32)
         "OVERDUE" -> Color(0xFFC62828)
@@ -104,7 +127,7 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 // Cover Buku
                 AsyncImage(
-                    model = loan.bookCoverUrl,
+                    model = bookCoverUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .width(70.dp)
@@ -124,14 +147,25 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = loan.bookTitle,
+                                text = bookTitle,
                                 fontWeight = FontWeight.ExtraBold,
                                 fontSize = 17.sp,
                                 color = Color(0xFF1E293B),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
-                            Text(text = loan.bookAuthor, color = Color(0xFF64748B), fontSize = 13.sp)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = bookAuthor, color = Color(0xFF64748B), fontSize = 13.sp)
+                                if (!borrowerName.isNullOrBlank()) {
+                                    Text(text = " • ", color = Color.LightGray)
+                                    Text(
+                                        text = borrowerName,
+                                        color = Color(0xFF0D47A1),
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
@@ -152,24 +186,26 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            Icons.Default.DateRange, 
-                            contentDescription = null, 
-                            tint = Color(0xFF94A3B8), 
+                            Icons.Default.DateRange,
+                            contentDescription = null,
+                            tint = Color(0xFF94A3B8),
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "Pinjam: ${loan.borrowDate}", color = Color(0xFF475569), fontSize = 12.sp)
+                        val displayBorrowDate = loan.borrowDate.split("T").firstOrNull() ?: loan.borrowDate
+                        Text(text = "Pinjam: $displayBorrowDate", color = Color(0xFF475569), fontSize = 12.sp)
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            Icons.Default.DateRange, 
-                            contentDescription = null, 
-                            tint = Color(0xFF94A3B8), 
+                            Icons.Default.DateRange,
+                            contentDescription = null,
+                            tint = Color(0xFF94A3B8),
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = "Tenggat: ${loan.dueDate}", color = Color(0xFF475569), fontSize = 12.sp)
+                        val displayDueDate = loan.dueDate.split("T").firstOrNull() ?: loan.dueDate
+                        Text(text = "Tenggat: $displayDueDate", color = Color(0xFF475569), fontSize = 12.sp)
                     }
                 }
             }
@@ -184,8 +220,8 @@ fun BorrowingItemCard(loan: Loan, onExtend: (Int) -> Unit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Perpanjangan ${loan.extensionCount}/2", 
-                    color = Color(0xFF64748B), 
+                    text = "Perpanjangan ${loan.extensionCount}/2",
+                    color = Color(0xFF64748B),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium
                 )

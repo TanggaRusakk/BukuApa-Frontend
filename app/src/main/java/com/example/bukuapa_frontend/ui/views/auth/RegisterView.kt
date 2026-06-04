@@ -44,7 +44,7 @@ fun RegisterView(
     ) {
         Spacer(Modifier.height(48.dp))
 
-        // 🌟 LOGO BUKUAPA SESUAI GAMBAR
+        // 🌟 LOGO BUKUAPA
         Image(
             painter = painterResource(R.drawable.bukuapa),
             contentDescription = "Logo BukuApa",
@@ -54,9 +54,17 @@ fun RegisterView(
         )
 
         Spacer(Modifier.height(16.dp))
-        Text("BukuApa", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1158C4))
-        Spacer(Modifier.height(8.dp))
-        Text("Perpustakaan digital di genggaman", fontSize = 14.sp, color = Color(0xFF5A5A5A))
+        Text(
+            "BukuApa", 
+            fontSize = 28.sp, 
+            fontWeight = FontWeight.ExtraBold, 
+            color = Color(0xFF0D47A1)
+        )
+        Text(
+            "Perpustakaan digital di genggaman", 
+            fontSize = 14.sp, 
+            color = Color(0xFF64748B)
+        )
 
         Spacer(Modifier.height(40.dp))
 
@@ -73,9 +81,22 @@ fun RegisterView(
         )
 
         Spacer(Modifier.height(32.dp))
+        
         if (error != null) {
-            Text(text = error!!, color = Color.Red, fontSize = 12.sp)
-            Spacer(Modifier.height(8.dp))
+            Surface(
+                color = Color(0xFFFFEBEE),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = error!!, 
+                    color = Color(0xFFC62828), 
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(12.dp),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            Spacer(Modifier.height(16.dp))
         }
 
         PrimaryButton(
@@ -88,12 +109,12 @@ fun RegisterView(
         Spacer(Modifier.weight(1f))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Sudah punya akun? ", color = Color.Gray, fontSize = 14.sp)
+            Text("Sudah punya akun? ", color = Color(0xFF64748B), fontSize = 14.sp)
             TextButton(onClick = onNavigateToLogin, contentPadding = PaddingValues(0.dp)) {
                 Text(
                     "Masuk",
-                    color = Color(0xFF1158C4),
-                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0D47A1),
+                    fontWeight = FontWeight.ExtraBold,
                     fontSize = 14.sp
                 )
             }

@@ -23,9 +23,12 @@ class BorrowingRepository {
         }
     }
 
-    suspend fun createLoan(token: String, bookId: Int): Result<Loan> {
+    suspend fun createLoanForUser(token: String, userId: Int, bookId: Int): Result<Loan> {
         return try {
-            val response = ApiClient.instance.createLoan("Bearer $token", mapOf("bookId" to bookId))
+            val response = ApiClient.instance.createLoan(
+                "Bearer $token", 
+                mapOf("userId" to userId, "bookId" to bookId)
+            )
             Result.success(response.data)
         } catch (e: Exception) {
             Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Buat peminjaman")))

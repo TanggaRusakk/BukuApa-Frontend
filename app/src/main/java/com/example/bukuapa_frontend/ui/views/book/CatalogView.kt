@@ -35,6 +35,17 @@ fun CatalogView(
     val currentUser by viewModel.currentUser.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    // Logika filter lokal untuk menangani space/case insensitive sesuai permintaan
+    val filteredBooks = remember(books, searchQuery) {
+        if (searchQuery.isEmpty()) books else {
+            val cleanQuery = searchQuery.replace(" ", "").lowercase()
+            books.filter { 
+                it.title.replace(" ", "").lowercase().contains(cleanQuery) ||
+                it.author.replace(" ", "").lowercase().contains(cleanQuery)
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,7 +54,7 @@ fun CatalogView(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- 1. HEADER ---
+        // --- 1. HEADER (Profil Tanpa Notif/Menu) ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Start,
@@ -82,10 +93,7 @@ fun CatalogView(
         ) {
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { 
-                    searchQuery = it
-                    viewModel.loadBooks(searchQuery)
-                },
+                onValueChange = { searchQuery = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Cari judul buku atau penulis...", color = Color(0xFF94A3B8), fontSize = 14.sp) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF64748B)) },
@@ -114,10 +122,7 @@ fun CatalogView(
                 fontSize = 20.sp,
                 color = Color(0xFF1E293B)
             )
-            TextButton(onClick = { 
-                searchQuery = ""
-                viewModel.loadBooks()
-            }) {
+            TextButton(onClick = { searchQuery = "" }) {
                 Text("Lihat semua", color = Color(0xFF0D47A1), fontSize = 13.sp, fontWeight = FontWeight.Bold)
             }
         }
@@ -129,7 +134,7 @@ fun CatalogView(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = Color(0xFF0D47A1))
             }
-        } else if (books.isEmpty() && searchQuery.isNotEmpty()) {
+        } else if (filteredBooks.isEmpty() && searchQuery.isNotEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
                     "tidak dapat menemukan buku", 
@@ -146,7 +151,7 @@ fun CatalogView(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 24.dp)
             ) {
-                items(books) { book ->
+                items(filteredBooks) { book ->
                     BookCard(book = book)
                 }
             }
