@@ -9,4 +9,7 @@ sealed class Screen(val route: String) {
     object Borrowing : Screen("borrowing")
     object Account : Screen("akun")
     object CreateLoan : Screen("create_loan")
+    object BookDetail : Screen("book_detail/{bookId}") {
+        fun createRoute(bookId: Int) = "book_detail/$bookId"
+    }
 }

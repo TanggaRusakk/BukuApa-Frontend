@@ -1,6 +1,7 @@
 package com.example.bukuapa_frontend.ui.views.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,12 +23,14 @@ import com.example.bukuapa_frontend.data.models.Book
 @Composable
 fun BookCard(
     book: Book,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(6.dp),
+            .padding(6.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -35,13 +38,12 @@ fun BookCard(
         Column(
             modifier = Modifier.padding(10.dp)
         ) {
-            // Gambar Cover dengan ratio yang pas
             AsyncImage(
                 model = book.coverUrl,
                 contentDescription = "Cover ${book.title}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(0.7f) // Portrait ratio
+                    .aspectRatio(0.7f)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Color(0xFFF0F2F5)),
                 contentScale = ContentScale.Crop
@@ -49,7 +51,6 @@ fun BookCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Judul Buku
             Text(
                 text = book.title.ifEmpty { "Judul Buku" },
                 fontWeight = FontWeight.Bold,
@@ -61,7 +62,6 @@ fun BookCard(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            // Penulis
             Text(
                 text = book.author.ifEmpty { "Nama Penulis" },
                 color = Color(0xFF74777F),
@@ -72,18 +72,16 @@ fun BookCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Baris Bawah: Rating & Stok
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Rating
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "Rating",
-                        tint = Color(0xFFFFB900), // Warna Gold lebih solid
+                        tint = Color(0xFFFFB900),
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -95,7 +93,6 @@ fun BookCard(
                     )
                 }
 
-                // Status Stok
                 Surface(
                     color = if (book.stock > 0) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
                     shape = RoundedCornerShape(4.dp)

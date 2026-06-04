@@ -30,6 +30,12 @@ interface ApiService {
         @Query("category") categoryId: Int? = null
     ): ApiResponse<List<Book>>
 
+    @GET("books/{bookId}")
+    suspend fun getBookById(
+        @Header("Authorization") token: String,
+        @Path("bookId") bookId: Int
+    ): ApiResponse<Book>
+
     @POST("books")
     suspend fun createBook(
         @Header("Authorization") token: String,
