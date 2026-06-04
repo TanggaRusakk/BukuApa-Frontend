@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,13 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.example.bukuapa_frontend.data.models.Loan
 import com.example.bukuapa_frontend.ui.viewmodels.borrowing.BorrowingViewModel
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
@@ -106,7 +105,6 @@ fun BorrowingItemCard(loan: Loan, role: String, onExtend: (Int) -> Unit, onRetur
     // Mengambil data dari nested object 'book' dan 'user' hasil include di backend
     val bookTitle = loan.book?.title ?: "Buku ID: ${loan.bookId}"
     val bookAuthor = loan.book?.author ?: "Penulis tidak diketahui"
-    val bookCoverUrl = loan.book?.coverUrl
     val borrowerName = loan.user?.name ?: "User ID: ${loan.userId}" // Fallback kalau nama kosong
 
     val statusText = when (loan.status) {
@@ -130,17 +128,22 @@ fun BorrowingItemCard(loan: Loan, role: String, onExtend: (Int) -> Unit, onRetur
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth()) {
-                // Cover Buku
-                AsyncImage(
-                    model = bookCoverUrl,
-                    contentDescription = null,
+                // Placeholder Cover Buku
+                Box(
                     modifier = Modifier
                         .width(70.dp)
                         .height(100.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF0F2F5)),
-                    contentScale = ContentScale.Crop
-                )
+                        .background(Color(0xFFF1F5F9)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Book,
+                        contentDescription = null,
+                        tint = Color(0xFF94A3B8),
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(16.dp))
 
