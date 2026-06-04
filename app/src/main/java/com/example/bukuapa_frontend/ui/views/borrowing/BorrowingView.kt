@@ -69,7 +69,7 @@ fun BorrowingView(
                     errorMessage
                 }
                 Box(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
-                    Text(text = "Error: $errorMessage", color = Color.Red, fontWeight = FontWeight.Bold)
+                    Text(text = "Error: $displayError", color = Color.Red, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -110,7 +110,6 @@ fun BorrowingItemCard(loan: Loan, role: String, onExtend: (Int) -> Unit, onRetur
     // Mengambil data dari nested object 'book' dan 'user' hasil include di backend
     val bookTitle = loan.book?.title ?: "Buku ID: ${loan.bookId}"
     val bookAuthor = loan.book?.author ?: "Penulis tidak diketahui"
-    val bookCoverUrl = loan.book?.coverUrl
     val borrowerName = loan.user?.name ?: "User ID: ${loan.userId}"
 
     val statusText = when (loan.status) {

@@ -20,7 +20,7 @@ class BookRepository : BookRepositoryProtocol {
             val response = ApiClient.instance.getBookById("Bearer $token", bookId)
             Result.success(response.data)
         } catch (e: Exception) {
-            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Ambil detail buku")))
+            Result.failure(Exception(NetworkUtils.parseError(e, "Ambil detail buku")))
         }
     }
 

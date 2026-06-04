@@ -29,7 +29,7 @@ class BorrowingRepository {
             val response = ApiClient.instance.returnLoan("Bearer $token", loanId)
             Result.success(response.data)
         } catch (e: Exception) {
-            Result.failure(Exception(NetworkUtils.parseErrorMessage(e, "Mengembalikan buku")))
+            Result.failure(Exception(NetworkUtils.parseError(e, "Mengembalikan buku")))
         }
     }
 

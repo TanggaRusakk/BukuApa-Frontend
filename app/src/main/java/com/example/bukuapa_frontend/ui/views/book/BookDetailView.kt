@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,7 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.example.bukuapa_frontend.ui.viewmodels.book.BookDetailViewModel
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
 
@@ -70,7 +70,6 @@ fun BookDetailView(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // --- 1. COVER BUKU ---
                     Surface(
                         shape = RoundedCornerShape(16.dp),
                         shadowElevation = 8.dp,
@@ -78,14 +77,20 @@ fun BookDetailView(
                             .width(180.dp)
                             .aspectRatio(0.7f)
                     ) {
-                        AsyncImage(
-                            model = data.coverUrl,
-                            contentDescription = data.title,
+                        // Placeholder Cover Buku
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Color(0xFFF0F2F5)),
-                            contentScale = ContentScale.Crop
-                        )
+                                .background(Color(0xFFF1F5F9)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Book,
+                                contentDescription = null,
+                                tint = Color(0xFF94A3B8),
+                                modifier = Modifier.size(64.dp)
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
