@@ -45,7 +45,7 @@ fun EditReviewDialog(
                         Icon(
                             imageVector = if (currentStar <= rating) Icons.Filled.Star else Icons.Outlined.StarBorder,
                             contentDescription = null,
-                            tint = if (currentStar <= rating) Color(0xFFFFB900) else Color.Gray,
+                            tint = if (currentStar <= rating) Color(0xFF0D47A1) else Color.Gray,
                             modifier = Modifier
                                 .size(32.dp)
                                 .clickable { rating = currentStar }
@@ -92,13 +92,17 @@ fun EditReviewDialog(
                         }
                     }
                 },
-                enabled = !isSubmitting && comment.isNotBlank()
+                enabled = !isSubmitting && comment.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0D47A1),
+                    contentColor = Color.White
+                )
             ) {
                 if (isSubmitting) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     )
                 } else {
                     Text("Simpan")

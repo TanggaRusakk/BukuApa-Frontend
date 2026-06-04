@@ -24,6 +24,7 @@ import com.example.bukuapa_frontend.data.models.Loan
 import com.example.bukuapa_frontend.ui.viewmodels.borrowing.BorrowingViewModel
 import com.example.bukuapa_frontend.ui.views.components.TopNavigatorBar
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun BorrowingView(
     onNavigateToCreate: () -> Unit,
@@ -240,35 +241,43 @@ fun BorrowingItemCard(loan: Loan, role: String, onExtend: (Int) -> Unit, onRetur
             HorizontalDivider(color = Color(0xFFF1F5F9), thickness = 1.dp)
             Spacer(modifier = Modifier.height(12.dp))
 
-            // FIX TOMBOL BAWAH
-            Row(
+            // FIX TOMBOL BAWAH: Gunakan FlowRow agar tidak nabrak di layar kecil
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                maxItemsInEachRow = Int.MAX_VALUE
             ) {
                 Text(
                     text = "Perpanjangan ${loan.extensionCount}/2",
                     color = Color(0xFF64748B),
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.align(Alignment.CenterVertically)
                 )
 
                 // Kumpulan Tombol di sebelah kanan
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     // Tombol Kembalikan (Khusus Staff & Kalau statusnya masih dipinjam/terlambat)
                     if (role == "STAFF" && loan.status != "RETURNED") {
                         OutlinedButton(
                             onClick = { onReturn(loan.id) },
                             shape = RoundedCornerShape(24.dp),
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
-                            modifier = Modifier.height(36.dp)
+                            modifier = Modifier.height(36.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color(0xFF0D47A1)
+                            )
                         ) {
                             Text("Kembalikan", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
 
-                    // Tombol Perpanjang (Khusus User & Jatah masih ada)
-                    if (role != "STAFF") {
+                    // Tombol Perpanjang (Bisa User, Bisa Staff bantu perpanjangin)
+                    if (loan.status != "RETURNED") {
                         Button(
                             onClick = { onExtend(loan.id) },
                             enabled = loan.status == "BORROWED" && loan.extensionCount < 2,

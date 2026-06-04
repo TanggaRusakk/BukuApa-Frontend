@@ -59,7 +59,7 @@ fun BookDetailView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detail Buku", fontWeight = FontWeight.ExtraBold) },
+                title = { Text("Detail Buku", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Kembali")
@@ -261,7 +261,7 @@ fun StatItem(label: String, value: String, icon: androidx.compose.ui.graphics.ve
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (icon != null) {
-                Icon(icon, contentDescription = null, tint = Color(0xFFFFB900), modifier = Modifier.size(16.dp))
+                Icon(icon, contentDescription = null, tint = Color(0xFF0D47A1), modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
             }
             Text(value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF1E293B))

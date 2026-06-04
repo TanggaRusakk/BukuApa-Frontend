@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -87,7 +88,11 @@ fun ReviewView(
                                         20
                                     )
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF0D47A1),
+                                    contentColor = Color.White
+                                )
                             ) {
                                 Text("Muat Lebih Banyak")
                             }
@@ -97,7 +102,7 @@ fun ReviewView(
             }
             is ReviewViewModel.ReviewUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = Color(0xFF0D47A1))
                 }
             }
             is ReviewViewModel.ReviewUiState.Empty -> {
@@ -109,8 +114,14 @@ fun ReviewView(
                     Text("Belum ada ulasan untuk buku ini", fontSize = 16.sp)
                     if (canReview) {
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = onWriteReview) {
-                            Text("Tulis Ulasan Pertama")
+                        Button(
+                            onClick = onWriteReview,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF0D47A1),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Text("Tulis Ulasan")
                         }
                     }
                 }
@@ -157,7 +168,13 @@ private fun ReviewHeader(
             )
         }
         if (canReview) {
-            ElevatedButton(onClick = onWriteReview) {
+            Button(
+                onClick = onWriteReview,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0D47A1),
+                    contentColor = Color.White
+                )
+            ) {
                 Text("Tulis Ulasan")
             }
         }
@@ -206,7 +223,7 @@ private fun ReviewItem(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = null,
                                 tint = if (index < review.rating)
-                                    MaterialTheme.colorScheme.primary
+                                    Color(0xFF0D47A1)
                                 else
                                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
                                 modifier = Modifier.size(16.dp)

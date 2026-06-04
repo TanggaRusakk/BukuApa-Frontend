@@ -22,7 +22,7 @@ fun PrimaryButton(
         modifier = modifier.height(50.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF1158C4),
+            containerColor = Color(0xFF0D47A1),
             contentColor = Color.White
         )
     ) {

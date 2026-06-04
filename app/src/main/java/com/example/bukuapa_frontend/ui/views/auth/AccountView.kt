@@ -43,17 +43,17 @@ fun AccountView(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .background(Color(0xFFF8F9FA)),
+                    .background(Color(0xFFF8FAFC)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color(0xFF1158C4))
+                CircularProgressIndicator(color = Color(0xFF0D47A1))
             }
         } else {
             Column(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .background(Color(0xFFF8F9FA))
+                    .background(Color(0xFFF8FAFC))
                     .verticalScroll(rememberScrollState())
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -62,7 +62,7 @@ fun AccountView(
                 Box(
                     modifier = Modifier
                         .size(100.dp)
-                        .background(Color(0xFF1158C4), CircleShape),
+                        .background(Color(0xFF0D47A1), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -96,7 +96,7 @@ fun AccountView(
                 Box(
                     modifier = Modifier
                         .background(
-                            color = if (userRole == "STAFF") Color(0xFF1158C4).copy(alpha = 0.1f) else Color.LightGray.copy(
+                            color = if (userRole == "STAFF") Color(0xFF0D47A1).copy(alpha = 0.1f) else Color.LightGray.copy(
                                 alpha = 0.3f
                             ),
                             shape = CircleShape
@@ -105,7 +105,7 @@ fun AccountView(
                 ) {
                     Text(
                         text = if (userRole == "STAFF") "Staf Perpustakaan" else "Anggota",
-                        color = if (userRole == "STAFF") Color(0xFF1158C4) else Color.DarkGray,
+                        color = if (userRole == "STAFF") Color(0xFF0D47A1) else Color.DarkGray,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -176,7 +176,7 @@ fun AccountView(
                         .height(50.dp),
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFD32F2F),
+                        containerColor = Color(0xFFC62828),
                         contentColor = Color.White
                     )
                 ) {

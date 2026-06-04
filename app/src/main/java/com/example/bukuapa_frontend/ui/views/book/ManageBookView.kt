@@ -37,7 +37,7 @@ fun ManageBookView(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { onNavigateToCreateUpdate(null) },
-                containerColor = Color(0xFF1158C4),
+                containerColor = Color(0xFF0D47A1),
                 contentColor = Color.White,
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -50,17 +50,17 @@ fun ManageBookView(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .background(Color(0xFFF8F9FA)),
+                    .background(Color(0xFFF8FAFC)),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color(0xFF1158C4))
+                CircularProgressIndicator(color = Color(0xFF0D47A1))
             }
         } else {
             LazyColumn(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
-                    .background(Color(0xFFF8F9FA)),
+                    .background(Color(0xFFF8FAFC)),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -102,12 +102,12 @@ fun ManageBookView(
 
                                 Box(
                                     modifier = Modifier
-                                        .border(1.dp, Color(0xFF4CAF50), RoundedCornerShape(50.dp))
+                                        .border(1.dp, Color(0xFF2E7D32), RoundedCornerShape(50.dp))
                                         .padding(horizontal = 8.dp, vertical = 4.dp)
                                 ) {
                                     Text(
                                         "Stok ${book.stock}",
-                                        color = Color(0xFF4CAF50),
+                                        color = Color(0xFF2E7D32),
                                         fontSize = 10.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -118,7 +118,7 @@ fun ManageBookView(
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = "Hapus",
-                                    tint = Color(0xFFD32F2F)
+                                    tint = Color(0xFFC62828)
                                 )
                             }
                         }
