@@ -14,6 +14,7 @@ import com.example.bukuapa_frontend.data.models.Book
 import com.example.bukuapa_frontend.ui.views.auth.AccountView
 import com.example.bukuapa_frontend.ui.views.auth.LoginView
 import com.example.bukuapa_frontend.ui.views.auth.RegisterView
+import com.example.bukuapa_frontend.ui.views.book.BookDetailView
 import com.example.bukuapa_frontend.ui.views.book.CatalogView
 import com.example.bukuapa_frontend.ui.views.book.CreateUpdateBookView
 import com.example.bukuapa_frontend.ui.views.book.ManageBookView
@@ -22,6 +23,8 @@ import com.example.bukuapa_frontend.ui.views.borrowing.CreateLoanView
 import com.example.bukuapa_frontend.ui.views.components.BottomNavigatorBar
 import com.example.bukuapa_frontend.utils.TokenManager
 import kotlinx.coroutines.launch
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 @Composable
 fun AppNavigation() {
@@ -143,7 +146,21 @@ fun AppNavigation() {
                     role = userRole,
                     onNavigate = { route ->
                         navController.navigate(route)
+                    },
+                    onNavigateToDetail = { bookId ->
+                        navController.navigate(Screen.BookDetail.createRoute(bookId))
                     }
+                )
+            }
+
+            composable(
+                route = Screen.BookDetail.route,
+                arguments = listOf(navArgument("bookId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val bookId = backStackEntry.arguments?.getInt("bookId") ?: 0
+                BookDetailView(
+                    bookId = bookId,
+                    onBackClick = { navController.popBackStack() }
                 )
             }
 
