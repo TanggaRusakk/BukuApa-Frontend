@@ -15,9 +15,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class CatalogViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = CatalogRepository()
-    private val userRepository = UserRepository()
     private val tokenManager = TokenManager(application)
+    private val repository = CatalogRepository(tokenManager)
+    private val userRepository = UserRepository()
 
     private val _books = MutableStateFlow<List<Book>>(emptyList())
     val books: StateFlow<List<Book>> = _books
@@ -49,7 +49,7 @@ class CatalogViewModel(application: Application) : AndroidViewModel(application)
             }
 
             // Fetch Categories
-            repository.getCategories(token).onSuccess {
+            repository.getCategories().onSuccess {
                 _categories.value = listOf(Category(0, "Semua")) + it
             }
 
@@ -62,11 +62,10 @@ class CatalogViewModel(application: Application) : AndroidViewModel(application)
     fun loadBooks(search: String? = null, categoryId: Int? = null) {
         viewModelScope.launch {
             _isLoading.value = true
-            val token = tokenManager.getToken().first() ?: return@launch
             
             val filterCategoryId = if (categoryId == 0) null else categoryId
             
-            repository.getBooks(token, search, filterCategoryId).onSuccess {
+            repository.getBooks(search, filterCategoryId).onSuccess {
                 _books.value = it
             }.onFailure { error ->
                 _errorMessage.value = error.message ?: "Gagal memuat buku."

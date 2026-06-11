@@ -2,41 +2,56 @@ package com.example.bukuapa_frontend.data.repositories
 
 import com.example.bukuapa_frontend.data.api.ApiClient
 import com.example.bukuapa_frontend.data.models.Loan
+import com.example.bukuapa_frontend.domain.protocols.BorrowingServiceProtocol
 import com.example.bukuapa_frontend.utils.NetworkUtils
+import com.example.bukuapa_frontend.utils.TokenManager
+import kotlinx.coroutines.flow.first
 
-class BorrowingRepository {
-    suspend fun getLoans(token: String): Result<List<Loan>> {
+class BorrowingRepository(
+    private val tokenManager: TokenManager
+) : BorrowingServiceProtocol {
+
+    private val apiService = ApiClient.instance
+
+    override suspend fun getLoans(): Result<List<Loan>> {
         return try {
-            val response = ApiClient.instance.getLoans("Bearer $token")
+            val token = tokenManager.getToken().first()
+            val authHeader = "Bearer ${token ?: return Result.failure(Exception("Token tidak ditemukan"))}"
+            val response = apiService.getLoans(authHeader)
             Result.success(response.data)
         } catch (e: Exception) {
             Result.failure(Exception(NetworkUtils.parseError(e, "Ambil data pinjaman")))
         }
     }
 
-    suspend fun extendLoan(token: String, loanId: Int): Result<Loan> {
+    override suspend fun extendLoan(loanId: Int): Result<Loan> {
         return try {
-            val response = ApiClient.instance.extendLoan("Bearer $token", loanId)
+            val token = tokenManager.getToken().first()
+            val authHeader = "Bearer ${token ?: return Result.failure(Exception("Token tidak ditemukan"))}"
+            val response = apiService.extendLoan(authHeader, loanId)
             Result.success(response.data)
         } catch (e: Exception) {
             Result.failure(Exception(NetworkUtils.parseError(e, "Perpanjang pinjaman")))
         }
     }
 
-    suspend fun returnLoan(token: String, loanId: Int): Result<Loan> {
+    override suspend fun returnLoan(loanId: Int): Result<Loan> {
         return try {
-            // FIX: Tambahin "Bearer " biar token JWT-nya kebaca valid oleh backend
-            val response = ApiClient.instance.returnLoan("Bearer $token", loanId)
+            val token = tokenManager.getToken().first()
+            val authHeader = "Bearer ${token ?: return Result.failure(Exception("Token tidak ditemukan"))}"
+            val response = apiService.returnLoan(authHeader, loanId)
             Result.success(response.data)
         } catch (e: Exception) {
             Result.failure(Exception(NetworkUtils.parseError(e, "Mengembalikan buku")))
         }
     }
 
-    suspend fun createLoanForUser(token: String, userId: Int, bookId: Int): Result<Loan> {
+    override suspend fun createLoan(userId: Int, bookId: Int): Result<Loan> {
         return try {
-            val response = ApiClient.instance.createLoan(
-                "Bearer $token",
+            val token = tokenManager.getToken().first()
+            val authHeader = "Bearer ${token ?: return Result.failure(Exception("Token tidak ditemukan"))}"
+            val response = apiService.createLoan(
+                authHeader,
                 mapOf("userId" to userId, "bookId" to bookId)
             )
             Result.success(response.data)

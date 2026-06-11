@@ -9,13 +9,12 @@ import com.example.bukuapa_frontend.data.repositories.CatalogRepository
 import com.example.bukuapa_frontend.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class BorrowingViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository = BorrowingRepository()
-    private val catalogRepository = CatalogRepository()
     private val tokenManager = TokenManager(application)
+    private val repository = BorrowingRepository(tokenManager)
+    private val catalogRepository = CatalogRepository(tokenManager)
 
     private val _loans = MutableStateFlow<List<Loan>>(emptyList())
     val loans: StateFlow<List<Loan>> = _loans
@@ -34,10 +33,9 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
-            val token = tokenManager.getToken().first() ?: return@launch
 
             // Backend sudah mengatur filter role (Staff vs Member) di endpoint GET /borrowings
-            repository.getLoans(token).onSuccess {
+            repository.getLoans().onSuccess {
                 _loans.value = it
             }.onFailure { error ->
                 _errorMessage.value = error.message ?: "Gagal memuat riwayat peminjaman."
@@ -49,9 +47,8 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
     fun extendLoan(loanId: Int) {
         viewModelScope.launch {
             _isLoading.value = true
-            val token = tokenManager.getToken().first() ?: return@launch
 
-            repository.extendLoan(token, loanId).onSuccess {
+            repository.extendLoan(loanId).onSuccess {
                 loadLoans()
             }.onFailure { error ->
                 _errorMessage.value = error.message ?: "Gagal memperpanjang pinjaman."
@@ -63,9 +60,8 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
     fun returnLoan(loanId: Int) {
         viewModelScope.launch {
             _isLoading.value = true
-            val token = tokenManager.getToken().first() ?: return@launch
 
-            repository.returnLoan(token, loanId).onSuccess {
+            repository.returnLoan(loanId).onSuccess {
                 loadLoans() // Refresh data setelah berhasil
             }.onFailure { error ->
                 _errorMessage.value = error.message ?: "Gagal mengembalikan buku."
@@ -77,12 +73,11 @@ class BorrowingViewModel(application: Application) : AndroidViewModel(applicatio
     fun createLoanByIsbnForUser(userId: Int, isbn: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
-            val token = tokenManager.getToken().first() ?: return@launch
 
-            catalogRepository.getBooks(token, search = isbn).onSuccess { books ->
+            catalogRepository.getBooks(search = isbn).onSuccess { books ->
                 val book = books.find { it.isbn.replace("-", "").trim() == isbn.replace("-", "").trim() }
                 if (book != null) {
-                    repository.createLoanForUser(token, userId, book.id).onSuccess {
+                    repository.createLoan(userId, book.id).onSuccess {
                         loadLoans()
                         onSuccess()
                     }.onFailure { error ->
